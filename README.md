@@ -67,6 +67,13 @@ erDiagram
     Queue ||--o{ Job : "contains"
     Queue ||--o{ DeadLetterQueue : "maintains"
     
+  ```mermaid
+erDiagram
+    Organization ||--o{ Project : "has many"
+    Project ||--o{ Queue : "has many"
+    Queue ||--o{ Job : "contains"
+    Queue ||--o{ DeadLetterQueue : "maintains"
+    
     Job ||--o{ JobExecution : "records"
     Job |o--o| DeadLetterQueue : "moves to (on failure)"
     
@@ -122,3 +129,4 @@ erDiagram
         String hostname
         Boolean isHealthy
     }
+```
