@@ -60,3 +60,65 @@ To interact with the system, simply open the `index.html` file in any modern web
 * \`POST /api/jobs\` - Enqueue a new job (Immediate or Scheduled).
 * \`GET /api/queues/:id/jobs\` - Fetch paginated jobs for a specific queue with optional status filtering.
 * \`GET /api/queues/:id/metrics\` - Retrieve aggregate counts of job statuses (Pending, Running, Completed, Failed, Dead Letter).
+
+erDiagram
+    Organization ||--o{ Project : "has many"
+    Project ||--o{ Queue : "has many"
+    Queue ||--o{ Job : "contains"
+    Queue ||--o{ DeadLetterQueue : "maintains"
+    
+    Job ||--o{ JobExecution : "records"
+    Job |o--o| DeadLetterQueue : "moves to (on failure)"
+    
+    Worker ||--o{ JobExecution : "performs"
+
+    Organization {
+        String id PK
+        String name
+        DateTime createdAt
+    }
+
+    Project {
+        String id PK
+        String name
+        String organizationId FK
+    }
+
+    Queue {
+        String id PK
+        String name
+        String projectId FK
+    }
+
+    Job {
+        String id PK
+        String queueId FK
+        Json payload
+        Int priority
+        String status
+        Int retryCount
+        Int maxRetries
+        DateTime scheduledAt
+    }
+
+    JobExecution {
+        String id PK
+        String jobId FK
+        String workerId FK
+        String status
+        Int attempt
+    }
+
+    DeadLetterQueue {
+        String id PK
+        String queueId FK
+        String jobId FK
+        Json payloadSnapshot
+        String errorReason
+    }
+
+    Worker {
+        String id PK
+        String hostname
+        Boolean isHealthy
+    }
